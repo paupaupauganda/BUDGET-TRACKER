@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget & Expenses Tracking System</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 Budget & Expenses Tracking System</h1>
+            <p>Financial Management Dashboard</p>
+        </header>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="card income-card">
+                <h3>Total Income</h3>
+                <p id="total-income">₱0.00</p>
+            </div>
+            <div class="card expense-card">
+                <h3>Total Expenses</h3>
+                <p id="total-expenses">₱0.00</p>
+            </div>
+            <div class="card balance-card">
+                <h3>Current Balance</h3>
+                <p id="balance">₱0.00</p>
+            </div>
+            <div class="card budget-card">
+                <h3>Budget Remaining</h3>
+                <p id="budget-remaining">₱0.00</p>
+            </div>
+        </div>
+
+        <!-- 🆕 Automatic Budget Allocation with Edit Button -->
+        <section class="section">
+            <h2>⚙️ Automatic Budget Allocation</h2>
+            <p class="sub-desc">Ilagay ang kabuuang budget, i-edit ang porsyento, awtomatikong mahahati ang halaga</p>
+            
+            <!-- Step 1: Enter Total Budget -->
+            <div class="allocation-budget-input">
+                <label><strong>1. Ilagay ang Kabuuang Budget:</strong></label>
+                <div class="input-btn-row">
+                    <input type="number" id="alloc-total-budget" placeholder="Halimbawa: 3000" step="0.01">
+                    <button id="set-total-budget-btn" class="btn primary">Set Budget</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Allocation Percentage with Edit Button -->
+            <div class="allocation-percent-section">
+                <div class="section-header-row">
+                    <label><strong>2. I-set ang Porsyento para sa Bawat Kategorya:</strong></label>
+                    <button id="toggle-edit-btn" class="btn secondary">✏️ Edit</button>
+                </div>
+                
+                <div class="allocation-inputs" id="allocation-inputs-container">
+                    <div class="alloc-row">
+                        <label>Savings</label>
+                        <input type="number" id="pct-savings" min="0" max="100" value="3" disabled>
+                        <span>%</span>
+                        <span class="alloc-amount" id="amt-savings">—</span>
+                    </div>
+                    <div class="alloc-row">
+                        <label>Food</label>
+                        <input type="number" id="pct-food" min="0" max="100" value="5" disabled>
+                        <span>%</span>
+                        <span class="alloc-amount" id="amt-food">—</span>
+                    </div>
+                    <div class="alloc-row">
+                        <label>Transportation</label>
+                        <input type="number" id="pct-transport" min="0" max="100" value="10" disabled>
+                        <span>%</span>
+                        <span class="alloc-amount" id="amt-transport">—</span>
+                    </div>
+                    <div class="alloc-row">
+                        <label>Bills & Utilities</label>
+                        <input type="number" id="pct-bills" min="0" max="100" value="40" disabled>
+                        <span>%</span>
+                        <span class="alloc-amount" id="amt-bills">—</span>
+                    </div>
+                    <div class="alloc-row">
+                        <label>Shopping</label>
+                        <input type="number" id="pct-shopping" min="0" max="100" value="15" disabled>
+                        <span>%</span>
+                        <span class="alloc-amount" id="amt-shopping">—</span>
+                    </div>
+                    <div class="alloc-row">
+                        <label>Entertainment</label>
+                        <input type="number" id="pct-entertainment" min="0" max="100" value="7" disabled>
+                        <span>%</span>
+                        <span class="alloc-amount" id="amt-entertainment">—</span>
+                    </div>
+                    <div class="alloc-row">
+                        <label>Other</label>
+                        <input type="number" id="pct-other" min="0" max="100" value="20" disabled>
+                        <span>%</span>
+                        <span class="alloc-amount" id="amt-other">—</span>
+                    </div>
+                </div>
+                
+                <div class="alloc-summary">
+                    <p>Kabuuang Porsyento: <strong id="total-pct">100%</strong></p>
+                    <button id="apply-allocation-btn" class="btn success">✅ Apply Allocation</button>
+                </div>
+            </div>
+
+            <!-- Allocated Budget Breakdown -->
+            <div class="allocated-breakdown" id="allocated-breakdown" style="display: none;">
+                <h3>📊 Nakalaang Budget sa Bawat Kategorya</h3>
+                <div class="breakdown-grid" id="breakdown-list"></div>
+            </div>
+        </section>
+
+        <!-- Original Budget Planning — Still Works -->
+        <section class="section">
+            <h2>📋 Set Budget Manually (Original)</h2>
+            <div class="form-row">
+                <input type="number" id="budget-amount" placeholder="Ilagay ang Kabuuang Budget (₱)" step="0.01">
+                <button id="set-budget-btn" class="btn primary">Set Budget</button>
+            </div>
+            <div class="progress-bar">
+                <div id="budget-progress" class="progress-fill"></div>
+            </div>
+            <p id="budget-status"></p>
+        </section>
+
+        <!-- Add Transaction -->
+        <section class="section">
+            <h2>➕ Add Transaction</h2>
+            <form id="transaction-form" class="form-grid">
+                <input type="text" id="desc" placeholder="Description" required>
+                <input type="number" id="amount" placeholder="Amount (₱)" step="0.01" required>
+                <select id="type">
+                    <option value="expense">Expense</option>
+                    <option value="income">Income</option>
+                </select>
+                <select id="category">
+                    <option value="food">Food</option>
+                    <option value="transport">Transportation</option>
+                    <option value="bills">Bills & Utilities</option>
+                    <option value="shopping">Shopping</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="savings">Savings</option>
+                    <option value="other">Other</option>
+                </select>
+                <input type="date" id="date" required>
+                <button type="submit" class="btn success">Add Transaction</button>
+            </form>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="section">
+            <h2>📊 Data Analysis</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Expenses by Category</h3>
+                    <canvas id="category-chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>Income vs Expenses</h3>
+                    <canvas id="trend-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transaction History -->
+        <section class="section">
+            <div class="header-row">
+                <h2>📝 Transaction History</h2>
+                <button id="clear-all-btn" class="btn danger">Clear All</button>
+            </div>
+            <div class="filter-row">
+                <input type="text" id="search-input" placeholder="Search transactions...">
+                <select id="filter-type">
+                    <option value="all">All Types</option>
+                    <option value="income">Income Only</option>
+                    <option value="expense">Expense Only</option>
+                </select>
+            </div>
+            <div class="table-wrapper">
+                <table id="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transaction-list"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>Budget & Expenses Tracking System | Financial Management © 2026</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
